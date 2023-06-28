@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    @apply h-full;
+    @apply w-full;
+    @apply bg-neutral-800;
+    @apply text-neutral-400;
+    @apply selection:bg-neutral-400;
+    @apply selection:text-gray-700;
+  }
+
+  #root {
+    @apply flex;
+    @apply flex-col;
+    @apply h-full;
+    @apply w-full;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-slate-300;
+  }
+}
