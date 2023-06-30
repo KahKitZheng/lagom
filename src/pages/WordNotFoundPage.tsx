@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useParams } from "react-router-dom";
 import CharacterError from "../assets/svg/character_404.svg";
 import ArrowRigthIcon from "../assets/icons/solid/ArrowRigthIcon";

@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import CharacterHome from "../assets/svg/character_home.svg";
 import PrivacyScreen from "../components/PrivacyScreen";
 import XIcon from "../assets/icons/solid/CloseIcon";
 import axios from "axios";
+import { useViewportWidth } from "../hooks/useViewportWidth";
+import { MEDIA } from "../constants/media";
 
 const HomePage = () => {
   const [wordQuery, setWordQuery] = useState("");
   const [localSearches, setLocalSearches] = useState([] as string[]);
 
   const navigate = useNavigate();
+  const isDesktop = useViewportWidth(MEDIA.TABLET);
   const localStorageName = "dictionary-searches";
 
   function redirectToWordPage(word: string) {
@@ -68,7 +71,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="sticky top-0 flex h-screen w-full flex-col items-end border-[8px] border-r-0 border-white bg-neutral-950 p-6 lg:px-16">
+    <div className="sticky top-0 flex h-screen w-full flex-col items-end border-[8px] border-neutral-100 bg-neutral-950 p-6 lg:border-r-0 lg:px-16">
       <motion.div
         className="flex w-full flex-1 flex-col"
         initial="hidden"
@@ -119,7 +122,7 @@ const HomePage = () => {
         />
       </motion.div>
 
-      {/* <PrivacyScreen /> */}
+      {!isDesktop ? <PrivacyScreen /> : null}
     </div>
   );
 };

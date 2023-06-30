@@ -3,33 +3,32 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Word } from "../typings";
 import { motion } from "framer-motion";
 import axios from "axios";
-import WordNotFoundPage from "../pages/WordNotFoundPage";
 import PrivacyScreen from "../components/PrivacyScreen";
 import PlayIcon from "../assets/icons/solid/PlayIcon";
 import StarIcon from "../assets/icons/solid/StarIcon";
 import StarIconOutline from "../assets/icons/outline/StarIcon";
+import { useViewportWidth } from "../hooks/useViewportWidth";
+import { MEDIA } from "../constants/media";
 
-type WordPageProps = {
-  response: Word;
-};
+const WordPage = () => {
+  const { word } = useParams();
 
-const WordPage = ({ response }: WordPageProps) => {
-  // const { word } = useParams();
+  const navigate = useNavigate();
+  const isDesktop = useViewportWidth(MEDIA.TABLET);
 
   const [isBookmarked, setIsBookmarked] = useState(false);
-  // const [response, setResponse] = useState({} as Word);
+  const [response, setResponse] = useState({} as Word);
 
-  // // Fetch word data from API
-  // useEffect(() => {
-  //   axios
-  //     .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-  //     .then((res) => setResponse(res.data[0]))
-  //     .catch((err) => {
-  //       if (err.response.status === 404) {
-  //         setErrorStatus(err.response.status);
-  //       }
-  //     });
-  // }, [setErrorStatus, word]);
+  useEffect(() => {
+    axios
+      .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+      .then((res) => setResponse(res.data[0]))
+      .catch((err) => {
+        if (err.response.status === 404) {
+          navigate(`/${word}/404`);
+        }
+      });
+  }, [navigate, word]);
 
   // Check if data for the phonetic text and audio is available
   const phoneticWithAudio = response?.phonetics?.filter(
@@ -69,7 +68,7 @@ const WordPage = ({ response }: WordPageProps) => {
 
   return (
     <motion.div className="flex h-full flex-col gap-4 bg-neutral-100 p-4 pb-8 lg:p-12 lg:py-20">
-      <div className="max-w-[40rem]">
+      <div>
         <div>
           <Link to={"/"} className="text-xs text-neutral-400 lg:hidden">
             Back
@@ -158,7 +157,8 @@ const WordPage = ({ response }: WordPageProps) => {
           ) : null}
         </div>
       </div>
-      {/* <PrivacyScreen /> */}
+
+      {!isDesktop ? <PrivacyScreen /> : null}
     </motion.div>
   );
 };

@@ -1,28 +1,15 @@
 import React from "react";
 import { useLocation, useRoutes } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import HomePage from "./pages/HomePage";
-import WordPage from "./pages/WordPage";
-import DesktopPage from "./pages/DesktopPage";
-import WordNotFoundPage from "./pages/WordNotFoundPage";
+import { DESKTOP_ROUTES, MOBILE_ROUTES } from "./constants/routes";
+import { useViewportWidth } from "./hooks/useViewportWidth";
+import { MEDIA } from "./constants/media";
 
 function App() {
   const location = useLocation();
+  const isDesktop = useViewportWidth(MEDIA.TABLET);
 
-  const element = useRoutes([
-    // {
-    //   path: "/",
-    //   element: <DesktopPage />,
-    // },
-    {
-      path: "/:word?",
-      element: <DesktopPage />,
-    },
-    {
-      path: "/:word/404",
-      element: <WordNotFoundPage />,
-    },
-  ]);
+  const element = useRoutes(isDesktop ? DESKTOP_ROUTES : MOBILE_ROUTES);
 
   if (!element) return null;
 

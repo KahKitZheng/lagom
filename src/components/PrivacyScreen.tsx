@@ -1,11 +1,6 @@
-import React from "react";
 import { motion, useIsPresent } from "framer-motion";
 
-type PrivacyScreenProps = {
-  wordExists?: boolean;
-};
-
-const PrivacyScreen = ({ wordExists = true }: PrivacyScreenProps) => {
+const PrivacyScreen = () => {
   const isPresent = useIsPresent();
 
   return (
