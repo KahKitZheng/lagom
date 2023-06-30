@@ -4,7 +4,7 @@ import PrivacyScreen from "../components/PrivacyScreen";
 
 const DesktopPage = () => {
   return (
-    <div className="grid flex-1 grid-cols-2 overflow-y-scroll">
+    <div className="scrollbar-y grid flex-1 grid-cols-2 overflow-y-scroll">
       <HomePage />
       <WordPage />
 
