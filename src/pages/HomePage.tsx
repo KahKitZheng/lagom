@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import CharacterHome from "../assets/svg/character_home.svg";
 import PrivacyScreen from "../components/PrivacyScreen";
@@ -9,11 +9,14 @@ import { useViewportWidth } from "../hooks/useViewportWidth";
 import { MEDIA } from "../constants/media";
 
 const HomePage = () => {
+  const { word } = useParams();
+
   const [wordQuery, setWordQuery] = useState("");
   const [localSearches, setLocalSearches] = useState([] as string[]);
 
   const navigate = useNavigate();
   const isDesktop = useViewportWidth(MEDIA.TABLET);
+
   const localStorageName = "dictionary-searches";
 
   function redirectToWordPage(word: string) {
@@ -66,6 +69,10 @@ const HomePage = () => {
       });
   }
 
+  function isLocalSeachActive(searchQuery: string) {
+    return word === searchQuery ? "bg-neutral-700 text-neutral-300" : "";
+  }
+
   useEffect(() => {
     getLocalSearches();
   }, []);
@@ -97,7 +104,9 @@ const HomePage = () => {
             {localSearches.map((searchQuery) => (
               <div
                 key={searchQuery}
-                className="group flex cursor-pointer items-center rounded-full border border-neutral-700 pl-3 text-sm hover:bg-neutral-700 hover:text-neutral-300"
+                className={`group flex cursor-pointer items-center rounded-full border border-neutral-700 pl-3 text-sm hover:bg-neutral-700 hover:text-neutral-300 ${isLocalSeachActive(
+                  searchQuery
+                )}`}
                 onClick={() => handleOnClickLocalSearch(searchQuery)}
               >
                 <span className="p-1 pr-2">{searchQuery} </span>
