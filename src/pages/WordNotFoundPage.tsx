@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import CharacterError from "../assets/svg/character_404.svg";
 import ArrowRigthIcon from "../assets/icons/solid/ArrowRigthIcon";
+import PrivacyScreen from "../components/PrivacyScreen";
 
 const WordNotFoundPage = () => {
   const { word } = useParams();
@@ -25,6 +26,8 @@ const WordNotFoundPage = () => {
         alt="Cartoon character wondering what word to search for"
         className="absolute bottom-0 left-0 right-0 z-10 max-h-[13rem] w-full"
       />
+
+      <PrivacyScreen />
     </div>
   );
 };

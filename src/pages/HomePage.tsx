@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import CharacterHome from "../assets/svg/character_home.svg";
 import PrivacyScreen from "../components/PrivacyScreen";
 import XIcon from "../assets/icons/solid/CloseIcon";
+import axios from "axios";
 
 const HomePage = () => {
   const [wordQuery, setWordQuery] = useState("");
@@ -51,14 +52,25 @@ const HomePage = () => {
     getLocalSearches();
   }
 
+  function handleOnClickLocalSearch(searchQuery: string) {
+    axios
+      .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${searchQuery}`)
+      .then(() => {
+        redirectToWordPage(searchQuery);
+      })
+      .catch((err) => {
+        err.response.status === 404 && navigate(`/${searchQuery}/404`);
+      });
+  }
+
   useEffect(() => {
     getLocalSearches();
   }, []);
 
   return (
-    <div className="flex flex-1 flex-col rounded-2xl border-[8px] border-white bg-neutral-950 p-6">
+    <div className="sticky top-0 flex h-screen w-full flex-col items-end border-[8px] border-r-0 border-white bg-neutral-950 p-6 lg:px-16">
       <motion.div
-        className="flex flex-1 flex-col"
+        className="flex w-full flex-1 flex-col"
         initial="hidden"
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -83,12 +95,15 @@ const HomePage = () => {
               <div
                 key={searchQuery}
                 className="group flex cursor-pointer items-center rounded-full border border-neutral-700 pl-3 text-sm hover:bg-neutral-700 hover:text-neutral-300"
-                onClick={() => redirectToWordPage(searchQuery)}
+                onClick={() => handleOnClickLocalSearch(searchQuery)}
               >
                 <span className="p-1 pr-2">{searchQuery} </span>
                 <button
                   className="rounded-full border-0 group-hover:bg-neutral-500 group-hover:text-white"
-                  onClick={() => removeLocalSearch(searchQuery)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    removeLocalSearch(searchQuery);
+                  }}
                 >
                   <XIcon className="aspect-square p-1" />
                 </button>
@@ -100,11 +115,11 @@ const HomePage = () => {
         <img
           src={CharacterHome}
           alt="Cartoon character wondering what word to search for"
-          className="absolute bottom-0 right-4 z-10 w-1/2 max-w-[12rem] overflow-hidden"
+          className="absolute bottom-0 right-4 z-10 w-1/2 max-w-[12rem] overflow-hidden lg:right-12"
         />
       </motion.div>
 
-      <PrivacyScreen />
+      {/* <PrivacyScreen /> */}
     </div>
   );
 };

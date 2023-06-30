@@ -7,7 +7,7 @@
   body {
     @apply h-full;
     @apply w-full;
-    @apply bg-zinc-100;
+    @apply bg-neutral-100;
     @apply text-zinc-400;
     @apply selection:bg-zinc-400;
     @apply selection:text-gray-700;

@@ -3,18 +3,24 @@ import { useLocation, useRoutes } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import HomePage from "./pages/HomePage";
 import WordPage from "./pages/WordPage";
+import DesktopPage from "./pages/DesktopPage";
+import WordNotFoundPage from "./pages/WordNotFoundPage";
 
 function App() {
   const location = useLocation();
 
   const element = useRoutes([
+    // {
+    //   path: "/",
+    //   element: <DesktopPage />,
+    // },
     {
-      path: "/",
-      element: <HomePage />,
+      path: "/:word?",
+      element: <DesktopPage />,
     },
     {
-      path: "/:word",
-      element: <WordPage />,
+      path: "/:word/404",
+      element: <WordNotFoundPage />,
     },
   ]);
 
