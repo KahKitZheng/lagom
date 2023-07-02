@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Word } from "../typings";
 import { motion } from "framer-motion";
@@ -9,9 +9,13 @@ import StarIcon from "../assets/icons/solid/StarIcon";
 import StarIconOutline from "../assets/icons/outline/StarIcon";
 import { useViewportWidth } from "../hooks/useViewportWidth";
 import { MEDIA } from "../constants/media";
+import { supabase } from "../supabase/supabaseClient";
+import AppContext from "../context/AppContext";
+import { getParamAsString } from "../utils";
 
 const WordPage = () => {
   const { word } = useParams();
+  const { user, bookmarks } = useContext(AppContext);
 
   const navigate = useNavigate();
   const isDesktop = useViewportWidth(MEDIA.TABLET);
@@ -19,6 +23,12 @@ const WordPage = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [response, setResponse] = useState({} as Word);
 
+  // Check if word is bookmarked
+  useEffect(() => {
+    setIsBookmarked(bookmarks.includes(getParamAsString(word)));
+  }, [bookmarks, user.user, word]);
+
+  // Redirect to 404 page if word is not found
   useEffect(() => {
     axios
       .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
@@ -56,18 +66,33 @@ const WordPage = () => {
 
   function renderBookMarkIcon() {
     return isBookmarked ? (
-      <StarIcon className="fill-violet-600" />
+      <StarIcon className="fill-violet-600 hover:fill-violet-400" />
     ) : (
       <StarIconOutline className="stroke-violet-300" />
     );
   }
 
-  function handleOnClickBookMark() {
-    setIsBookmarked(!isBookmarked);
+  async function handleOnClickBookMark() {
+    const { data } = await supabase.auth.getSession();
+
+    if (data.session?.user.id) {
+      if (isBookmarked) {
+        await supabase
+          .from("Bookmark")
+          .delete()
+          .eq("user_id", data.session?.user.id)
+          .eq("word", response.word);
+      } else {
+        await supabase
+          .from("Bookmark")
+          .insert({ user_id: data.session.user.id, word: response.word });
+      }
+      return setIsBookmarked(!isBookmarked);
+    }
   }
 
   return (
-    <motion.div className="flex h-full flex-col gap-4 bg-neutral-100 p-4 pb-8 lg:p-12 lg:py-20">
+    <motion.div className="flex flex-col gap-4 bg-neutral-100 p-4 pb-12 lg:p-12 lg:py-[6rem]">
       <div>
         <div>
           <Link to={"/"} className="text-xs text-neutral-400 lg:hidden">
@@ -88,9 +113,9 @@ const WordPage = () => {
                 <div>
                   <button
                     onClick={playPhonetic}
-                    className="flex aspect-square h-12 items-center justify-center rounded-full bg-violet-200 p-2"
+                    className="flex aspect-square h-12 items-center justify-center rounded-full bg-violet-200 p-2 transition-colors duration-200 hover:bg-violet-300"
                   >
-                    <PlayIcon className="fill-violet-500" />
+                    <PlayIcon className="fill-violet-600" />
                   </button>
                   <audio id="phonetic" src={phoneticWithAudio?.audio} />
                 </div>
@@ -114,7 +139,7 @@ const WordPage = () => {
                 {meaning.definitions.map((definition, index) => (
                   <li
                     key={index}
-                    className="ml-6 list-disc text-xs marker:text-violet-500"
+                    className="ml-6 list-disc text-sm leading-4 marker:text-violet-500"
                   >
                     <p className="text-neutral-600">{definition.definition}</p>
                     {definition.example && (
@@ -143,7 +168,7 @@ const WordPage = () => {
                   >
                     <a
                       key={sourceUrl}
-                      className="text-sm underline"
+                      className="text-sm underline hover:text-neutral-600"
                       href={sourceUrl}
                       target="__blank"
                       rel="noopener norefererrer"

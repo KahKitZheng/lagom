@@ -1,12 +1,18 @@
-import DesktopPage from "../pages/DesktopPage";
+import HomeWordPage from "../pages/HomeWordPage";
 import HomePage from "../pages/HomePage";
-import WordNotFoundPage from "../pages/WordNotFoundPage";
 import WordPage from "../pages/WordPage";
+import WordNotFoundPage from "../pages/WordNotFoundPage";
+import BookmarksPage from "../pages/BookmarksPage";
+import BookmarksWordPage from "../pages/BookmarksWordPage";
 
 export const DESKTOP_ROUTES = [
   {
     path: "/:word?",
-    element: <DesktopPage />,
+    element: <HomeWordPage />,
+  },
+  {
+    path: "/user/bookmarks/:word?",
+    element: <BookmarksWordPage />,
   },
   {
     path: "/:word/404",
@@ -22,6 +28,14 @@ export const MOBILE_ROUTES = [
   {
     path: "/:word?",
     element: <WordPage />,
+  },
+  {
+    path: "/user/bookmarks",
+    element: <BookmarksPage />,
+  },
+  {
+    path: "/user/bookmarks/:word?",
+    element: <BookmarksWordPage />,
   },
   {
     path: "/:word/404",

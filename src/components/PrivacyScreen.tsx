@@ -6,7 +6,6 @@ const PrivacyScreen = () => {
   return (
     <motion.div
       initial={{ scaleX: 1 }}
-      // initial={wordExists ? { scaleX: 1 } : { scaleX: 0 }}
       animate={{
         scaleX: 0,
         transition: { duration: 0.5, ease: "circOut" },

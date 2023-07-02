@@ -1,27 +1,29 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import CharacterHome from "../assets/svg/character_home.svg";
 import PrivacyScreen from "../components/PrivacyScreen";
 import XIcon from "../assets/icons/solid/CloseIcon";
 import axios from "axios";
+import AuthModal from "../components/AuthModal";
+import AppContext from "../context/AppContext";
 import { useViewportWidth } from "../hooks/useViewportWidth";
 import { MEDIA } from "../constants/media";
+import { supabase } from "../supabase/supabaseClient";
+import Menu from "../components/Menu";
 
 const HomePage = () => {
   const { word } = useParams();
+  const { user, setUser, setBookmarks } = useContext(AppContext);
 
   const [wordQuery, setWordQuery] = useState("");
   const [localSearches, setLocalSearches] = useState([] as string[]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const isDesktop = useViewportWidth(MEDIA.TABLET);
 
   const localStorageName = "dictionary-searches";
-
-  function redirectToWordPage(word: string) {
-    navigate(`/${word}`);
-  }
 
   function handleInputSearch(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
@@ -58,6 +60,10 @@ const HomePage = () => {
     getLocalSearches();
   }
 
+  function redirectToWordPage(word: string) {
+    navigate(`/${word}`);
+  }
+
   function handleOnClickLocalSearch(searchQuery: string) {
     axios
       .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${searchQuery}`)
@@ -73,21 +79,35 @@ const HomePage = () => {
     return word === searchQuery ? "bg-neutral-700 text-neutral-300" : "";
   }
 
+  async function signOut() {
+    await supabase.auth.signOut().then(() => {
+      setUser({ user: null });
+      setBookmarks([]);
+    });
+  }
+
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    setUser(data);
+  };
+
   useEffect(() => {
     getLocalSearches();
   }, []);
 
   return (
-    <div className="sticky top-0 flex h-screen w-full flex-col items-end border-[8px] border-neutral-100 bg-neutral-950 p-6 lg:border-r-0 lg:px-16">
+    <div className="sticky top-0 flex h-screen w-full flex-col border-[8px] border-neutral-100 bg-neutral-950 p-6 md:border-r-0 lg:px-16 lg:py-8">
+      <Menu />
+
       <motion.div
         className="flex w-full flex-1 flex-col"
-        initial="hidden"
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        // initial="hidden"
+        // animate={{ opacity: 1 }}
+        // exit={{ opacity: 0 }}
+        // transition={{ duration: 0.5 }}
       >
-        <div className="mt-12 flex-1">
-          <h1 className="text-5xl font-bold text-slate-100">
+        <div className="flex-1">
+          <h1 className="mb-6 mt-8 text-5xl font-bold text-slate-100">
             This is your{" "}
             <span className="inline-block text-violet-500">dictionary</span>
           </h1>
@@ -95,7 +115,7 @@ const HomePage = () => {
             type="text"
             value={wordQuery}
             onChange={(e) => setWordQuery(e.target.value)}
-            className="mt-8 w-full rounded-md border border-neutral-700/60 bg-neutral-900 px-4 py-2 placeholder:text-sm placeholder:text-neutral-500"
+            className="w-full rounded-md border border-neutral-700/60 bg-neutral-900 px-4 py-2 placeholder:text-sm placeholder:text-neutral-500 focus:outline-double focus:outline-neutral-500"
             placeholder="What word are we learning today?"
             onKeyDown={handleInputSearch}
           />
@@ -123,13 +143,36 @@ const HomePage = () => {
             ))}
           </div>
         </div>
+        {/* {user.user?.email ? (
+          <button
+            className="w-fit text-sm text-neutral-600 hover:text-neutral-400"
+            onClick={signOut}
+          >
+            Sign out
+          </button>
+        ) : (
+          <button
+            className="w-fit text-sm text-neutral-600 hover:text-neutral-400"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Sign in
+          </button>
+        )} */}
 
         <img
           src={CharacterHome}
           alt="Cartoon character wondering what word to search for"
-          className="absolute bottom-0 right-4 z-10 w-1/2 max-w-[12rem] overflow-hidden lg:right-12"
+          className="absolute bottom-4 left-8 z-10 max-h-[25vh] overflow-hidden"
         />
       </motion.div>
+
+      <AuthModal
+        isModalOpen={isModalOpen}
+        closeModal={() => {
+          setIsModalOpen(false);
+          getUser();
+        }}
+      />
 
       {!isDesktop ? <PrivacyScreen /> : null}
     </div>
